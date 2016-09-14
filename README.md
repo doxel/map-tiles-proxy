@@ -30,7 +30,7 @@ You can run it as a middleware (eg: for nodejs http or expressjs)
 
 Or you can run it standalone with ```npm start``` for development.
 
-In production you may want to run it with IBM's StrongLoop Process Manager (http://strong-pm.io/getting-started/) are another nodejs cluster manager, since probably you want to load or to serve several tiles simultaneously
+In production you may want to run it with IBM's StrongLoop Process Manager (http://strong-pm.io/getting-started/) are another nodejs cluster manager, since probably you want to load or to serve a lot of tiles simultaneously
 
 The example configuration above allow the following url formats:
 
