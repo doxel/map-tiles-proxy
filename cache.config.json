@@ -1,0 +1,13 @@
+{                 
+  "urlFromQueryString": true,
+  "routes": {              
+    "osm": {               
+      "url": [             
+        "a.tile.openstreetmap.org/",
+        "b.tile.openstreetmap.org/",
+        "c.tile.openstreetmap.org/"
+      ]                  
+    }                    
+  }                      
+}                        
+
