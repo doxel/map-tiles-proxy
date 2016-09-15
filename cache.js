@@ -124,6 +124,15 @@ module.exports=function(config){
 
   } // mkdir
 
+  function set_CORS_headers(req,res) {
+    // Allows requests from anywhere
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Allows any HTTP Verb
+    res.setHeader('Access-Control-Allow-Methods', req.headers['access-control-request-method'] || '' );
+    // Allows any HTTP Request Header
+    res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || '' );
+  }
+
   function onRequest(req, res, next) {
 
     var queryData;
@@ -228,6 +237,7 @@ module.exports=function(config){
           fs.createReadStream(filecache).pipe(res);
 
         } else {
+          set_CORS_headers(req,res);
           // download file, pipe to client and save to cache
           mkdir(path.dirname(filecache),function(){
             console.log('caching:',filecache);
@@ -249,7 +259,7 @@ module.exports=function(config){
                 } catch(e) {
                   console.log(e);
                 }
-                abort(new Error('ERROR: '+response.statusCode + ' ' + response.statusMessage));
+                abort(new Error('ERROR: '+response.statusCode + ' ' + response.statusMessage+' '+origin+'/'+filepath));
               }
             })
             .fail(abort)
