@@ -39,14 +39,19 @@ module.exports=function(config){
   var fs=require('fs');
   var dl=require('download-q');
   var extend=require('extend');
+  var mime=require('mime');
 
-  config=config||{};
+  config=extend({
+    cacheControl: 'public, max-age=315360000'  // 10 year
+  },config);
 
   /*
   config={
+    cacheControl: 'no-cache',
     urlFromQueryString: true,
     routes: {
       osm: {
+        cacheControl: 'public, max-age=8640000', // 100 days
         url: [
           'a.tile.openstreetmap.org/',
           'b.tile.openstreetmap.org/',
@@ -148,6 +153,7 @@ module.exports=function(config){
       res.end(e.message);
     }
 
+    var cacheControl=config.cacheControl;
 
     // allow urls like http://localhost:port/?url=http://a.tile.openstreetmap.org&dir=osm
     if (config.urlFromQueryString && req.url.indexOf('?')>=0) {
@@ -168,6 +174,7 @@ module.exports=function(config){
       }
     }
 
+
     // else try to match the requested document path with config routes
     if (!queryData || !queryData.url) {
 //      console.log(req.url);
@@ -182,6 +189,9 @@ module.exports=function(config){
           origin=protocol+route.url[0];
           cacheSubdir=route.dir||routeName;
           filepath=_url[2];
+          if (route.cacheControl) {
+            cacheControl=route.cacheControl;
+          }
         } else {
 
           // allow url=http://a.tile.openstreetmap.org/0/0/0.png
@@ -206,6 +216,9 @@ module.exports=function(config){
             }
 
             if (filepath) {
+              if (route.cacheControl) {
+                cacheControl=route.cacheControl;
+              }
               break;
             }
           }
@@ -230,14 +243,23 @@ module.exports=function(config){
         throw(new Error('ERROR: Path not authorized: '+filecache));
       }
 
+      var contentType=mime.lookup(filecache);
       fs.exists(filecache,function(doexists){
         if (doexists) {
           // send cached file
           console.log('cached: ',filecache);
-          fs.createReadStream(filecache).pipe(res);
+          var stream=fs.createReadStream(filecache);
+          stream.on('error',function(err){
+            abort(err);
+          });
+          res.setHeader('Cache-Control', cacheControl);
+          res.setHeader('Content-Type', contentType);
+          stream.pipe(res);
 
         } else {
           set_CORS_headers(req,res);
+          res.setHeader('Cache-Control', cacheControl);
+          res.setHeader('Content-Type', contentType);
           // download file, pipe to client and save to cache
           mkdir(path.dirname(filecache),function(){
             console.log('caching:',filecache);
