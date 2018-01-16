@@ -2,7 +2,7 @@
 Nodejs map tiles caching proxy, to use as middleware or standalone, locally or on a remote server.
 
 You can pass the configuration either when you require the module:
-```var cache=require('map-tile-proxy')(config);```
+```var cache=require('map-tiles-proxy')(config);```
 or put in in file cache.config.json.
 
 If both exists, definitions from the file will override defaults passed at require time.
